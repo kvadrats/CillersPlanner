@@ -1,3 +1,44 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+h1 {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+  line-height: 5.9rem;
+}
+
+.char {
+  transform: translateY(115px);
+  transition: transform 0.5s;
+}
+
+.border-thin {
+  border-bottom-width: 0.5px;
+}
+
+@layer base {
+  h1 {
+    @apply text-8xl font-bold text-white;
+  }
+  h2 {
+    @apply text-4xl;
+  }
+  h3 {
+    @apply text-3xl;
+  }
+  h4 {
+    @apply text-lg;
+  }
+  p {
+    @apply text-lg text-white;
+  }
+  button {
+    @apply text-lg text-white;
+  }
+}
+/* 
+  @layer utilities {
+    .text-balance {
+      text-wrap: balance;
+    }
+  } */
