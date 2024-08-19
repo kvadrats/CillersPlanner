@@ -219,9 +219,13 @@ modules:
       username: admin
       password: password
       script: |
-        CREATE COLLECTION main._default.items IF NOT EXISTS;
+        CREATE COLLECTION main._default.messages IF NOT EXISTS;
+        CREATE COLLECTION main._default.preferences IF NOT EXISTS;
+        CREATE COLLECTION main._default.work_schedules IF NOT EXISTS;
         CREATE PRIMARY INDEX IF NOT EXISTS ON main;
-        CREATE PRIMARY INDEX IF NOT EXISTS ON main._default.items;
+        CREATE PRIMARY INDEX IF NOT EXISTS ON main._default.messages;
+        CREATE PRIMARY INDEX IF NOT EXISTS ON main._default.preferences;
+        CREATE PRIMARY INDEX IF NOT EXISTS ON main._default.work_schedules;
       retries: 20
 
   - id: redpanda

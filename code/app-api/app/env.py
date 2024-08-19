@@ -22,6 +22,9 @@ def get_http_port() -> int | None:
         except ValueError:
             return None
 
+def get_open_ai_api_token() -> str | None:
+    return os.environ.get('OPEN_AI_API_TOKEN')
+
 def get_http_host() -> str:
     return os.environ.get('HTTP_HOST', '0.0.0.0')
 
@@ -67,6 +70,9 @@ def get_couchbase_conf() -> couchbase.ConnectionConf:
 
 def validate():
     ok = True
+    if not get_open_ai_api_token():
+        logger.error('OPEN_AI_API_TOKEN is not set')
+        ok = False
     if not get_auth_oidc_audience():
         logger.error('AUTH_OIDC_AUDIENCE is not set')
         ok = False
