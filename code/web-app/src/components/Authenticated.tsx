@@ -19,8 +19,17 @@ const Authenticated: React.FC<AuthenticatedProps> = ({
 }) => {
   return (
     <ApolloProvider client={create_api_client(csrf, on_graphql_error)}>
-      <div>Authenticated as: {JSON.stringify(userInfo)}</div>
-      <button onClick={logout}>Logout</button>
+      <div className="flex flex-col items-start p-4 w-auto">
+        <div>
+          <h3>Heey {userInfo.preferred_username}! 👋</h3>
+        </div>
+        <button
+          onClick={logout}
+          className="font-bold opacity-70 hover:opacity-100 mt-6"
+        >
+          Logout
+        </button>
+      </div>
     </ApolloProvider>
   );
 };

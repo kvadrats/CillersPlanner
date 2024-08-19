@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useAuthContext } from "../utils/authContext";
 
 interface ChatMessage {
   type: "user" | "bot";
@@ -7,10 +8,19 @@ interface ChatMessage {
 }
 
 const Chat: React.FC = () => {
+  const { userInfo } = useAuthContext();
   const [fadeIn, setFadeIn] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [chatLog, setChatLog] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (userInfo) {
+      console.log("Preferred Username:", userInfo.preferred_username);
+    } else {
+      console.log("No userInfo available");
+    }
+  }, [userInfo]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -20,30 +30,30 @@ const Chat: React.FC = () => {
       { type: "user", message: inputValue },
     ]);
 
-    sendMessage(inputValue);
+    if (userInfo && userInfo.preferred_username) {
+      sendMessage(inputValue, userInfo.preferred_username);
+    }
     setInputValue("");
   };
 
-  const sendMessage = (message: string) => {
-    const url = "https://api.openai.com/v1/chat/completions";
-    const headers = {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`,
-    };
+  const sendMessage = (message: string, username: string) => {
+    const url = "http://app-api:4000/chat/user_name";
     const data = {
-      model: "gpt-3.5-turbo-0301",
-      messages: [{ role: "user", content: message }],
+      user_name: username,
+      content: message,
     };
+
+    console.log("Sending data to backend:", data);
 
     setIsLoading(true);
 
     axios
-      .post(url, data, { headers: headers })
+      .post(url, data)
       .then((response) => {
         console.log(response);
         setChatLog((prevChatLog) => [
           ...prevChatLog,
-          { type: "bot", message: response.data.choices[0].message.content },
+          { type: "bot", message: response.data.content },
         ]);
         setIsLoading(false);
       })
