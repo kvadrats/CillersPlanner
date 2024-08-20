@@ -1,22 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useMutation, useQuery, useSubscription } from "@apollo/client";
 import { useAuthContext } from "../utils/authContext";
-import { gql, useMutation } from "@apollo/client";
+import { MESSAGE_CREATE, MESSAGES, MESSAGE_CREATED } from "./messages";
 
 interface ChatMessage {
   type: "user" | "assistant";
   message: string;
 }
-
-const MESSAGE_CREATE = gql`
-  mutation MessageCreate($message: String!, $username: String!) {
-    messageCreate(message: $message, username: $username) {
-      content
-      role
-      chatUser
-    }
-  }
-`;
 
 const Chat: React.FC = () => {
   const { userInfo } = useAuthContext();
@@ -25,7 +16,10 @@ const Chat: React.FC = () => {
   const [chatLog, setChatLog] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [sendMessageMutation] = useMutation(MESSAGE_CREATE);
+  const { data, loading, error, subscribeToMore } = useQuery(MESSAGES);
+  const [sendMessageMutation] = useMutation(MESSAGE_CREATE, {
+    errorPolicy: "all",
+  });
 
   useEffect(() => {
     if (userInfo) {
@@ -34,6 +28,31 @@ const Chat: React.FC = () => {
       console.log("No userInfo available");
     }
   }, [userInfo]);
+
+  useEffect(() => {
+    if (data) {
+      setChatLog(
+        data.messages.map((msg: any) => ({
+          type: "assistant",
+          message: msg.content,
+        }))
+      );
+    }
+  }, [data]);
+
+  useEffect(() => {
+    subscribeToMore({
+      document: MESSAGE_CREATED,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev;
+        const newMessage = subscriptionData.data.messageCreated;
+
+        return Object.assign({}, prev, {
+          messages: [...prev.messages, newMessage],
+        });
+      },
+    });
+  }, [subscribeToMore]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -70,9 +89,8 @@ const Chat: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    setFadeIn(true);
-  }, []);
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
 
   return (
     <div
