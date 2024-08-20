@@ -23,7 +23,7 @@ const Main: React.FC = () => {
     return <Authenticated logout={logout} userInfo={userInfo} csrf={csrf} />;
   })();
 
-  return <div>{component}</div>;
+  return <div> {component}</div>;
 };
 
 export default Main;

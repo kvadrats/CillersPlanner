@@ -1,10 +1,10 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Main from "./components/Main";
-import AuthCallback from "./components/AuthCallback";
+import { BrowserRouter as Router } from "react-router-dom";
+
 import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
 import Hero from "./components/Hero";
 import { useRef } from "react";
 import MainView from "./components/MainView";
+import { AuthProvider } from "./utils/authContext";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -18,13 +18,11 @@ const App: React.FC = () => {
   };
   return (
     <Router>
-      <Routes>
-        <Route path="/auth/callback" element={<AuthCallback />} />
-        <Route path="*" element={<Main />} />
-      </Routes>
       <Hero onClick={handleButtonClick} />
       <div ref={sidebarRef}>
-        <MainView />
+        <AuthProvider>
+          <MainView />
+        </AuthProvider>
       </div>
     </Router>
   );
