@@ -1,11 +1,22 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuthContext } from "../utils/authContext";
+import { gql, useMutation } from "@apollo/client";
 
 interface ChatMessage {
   type: "user" | "assistant";
   message: string;
 }
+
+const MESSAGE_CREATE = gql`
+  mutation MessageCreate($message: String!, $username: String!) {
+    messageCreate(message: $message, username: $username) {
+      content
+      role
+      chatUser
+    }
+  }
+`;
 
 const Chat: React.FC = () => {
   const { userInfo } = useAuthContext();
@@ -13,6 +24,8 @@ const Chat: React.FC = () => {
   const [inputValue, setInputValue] = useState("");
   const [chatLog, setChatLog] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  const [sendMessageMutation] = useMutation(MESSAGE_CREATE);
 
   useEffect(() => {
     if (userInfo) {
@@ -37,20 +50,17 @@ const Chat: React.FC = () => {
   };
 
   const sendMessage = async (message: string, username: string) => {
-    const url = "http://localhost:8080/messages";
-    const data = {
-      message,
-      username,
-    };
-
+    setIsLoading(true);
     try {
-      const response = await axios.post(url, data);
-      console.log(response);
+      const { data } = await sendMessageMutation({
+        variables: { message, username },
+      });
+      console.log(data);
       setChatLog((prevChatLog) => [
         ...prevChatLog,
         {
           type: "assistant",
-          message: response.data.data.messageCreate[0].content,
+          message: data.messageCreate.content,
         },
       ]);
     } catch (error) {
