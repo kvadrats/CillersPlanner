@@ -8,7 +8,7 @@ from ..auth import IsAuthenticated
 from ..db import create_message, list_messages, UserMessage
 from ..external_requests.open_ai import call_open_ai
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 @strawberry.input
@@ -30,6 +30,7 @@ def process_user_message(user_name: str, content: str):
 class Query:
     @strawberry.field
     def messages(self, user_name: str) -> List[UserMessage]:
+        logger.info(f"Querying messages for username: {user_name}")
         return list_messages(user_name)
 
 
@@ -39,6 +40,7 @@ class Mutation:
     async def message_create(self, messages: List[MessageCreateInput]) -> List[UserMessage]:
         created_items = []
         for message in messages:
+            logger.info(f"Mutating message: {message}")
             process_user_message(message.user_name, message.content)
         return created_items
 

@@ -37,7 +37,7 @@ const Chat: React.FC = () => {
   };
 
   const sendMessage = (message: string, username: string) => {
-    const url = "http://app-api:4000/chat/user_name";
+    const url = "http://0.0.0.0:4000/api";
     const data = {
       user_name: username,
       content: message,
