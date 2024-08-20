@@ -8,7 +8,7 @@ from . import couchbase as cb, env
 @strawberry.type
 class UserMessage:
     id: str
-    role: str
+    user_role: str
     content: str
     chat_user: str
 
@@ -30,17 +30,17 @@ class WorkSchedule:
     time_to: datetime.time
 
 
-def create_message(role: str, content: str, chat_user: str) -> UserMessage:
+def create_message(user_role: str, content: str, chat_user: str) -> UserMessage:
     id = str(uuid.uuid1())
     cb.insert(env.get_couchbase_conf(),
               cb.DocSpec(bucket=env.get_couchbase_bucket(),
                          collection='messages',
                          key=id,
-                         data={'role': role,
+                         data={'user_role': user_role,
                                'content': content,
                                'chat_user': chat_user})
               )
-    return UserMessage(id=id, role=role, content=content, chat_user=chat_user)
+    return UserMessage(id=id, user_role=user_role, content=content, chat_user=chat_user)
 
 
 #
@@ -49,13 +49,13 @@ def get_message(id: str) -> UserMessage | None:
                      cb.DocRef(bucket=env.get_couchbase_bucket(),
                                collection='messages',
                                key=id)):
-        return UserMessage(id=id, role=doc['role'], content=doc['content'], chat_user=doc['chat_user'])
+        return UserMessage(id=id, user_role=doc['user_role'], content=doc['content'], chat_user=doc['chat_user'])
 
 
 def list_messages(chat_user) -> list[UserMessage]:
     result = cb.exec(
         env.get_couchbase_conf(),
-        f"SELECT role, content, chat_user, META().id "
+        f"SELECT user_role, content, chat_user, META().id AS id "
         f"FROM {env.get_couchbase_bucket()}._default.messages "
         f"WHERE chat_user = '{chat_user}'"
     )

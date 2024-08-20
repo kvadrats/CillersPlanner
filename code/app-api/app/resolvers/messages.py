@@ -18,10 +18,9 @@ class MessageCreateInput:
 
 
 def process_user_message(user_name: str, content: str) -> UserMessage:
-    # messages = list_messages(user_name)
-    messages = []
+    messages = list_messages(user_name)
     create_message("user", content, user_name)
-    messages = [{"role": m.role, "content": m.content} for m in messages]
+    messages = [{"role": m.user_role, "content": m.content} for m in messages]
     response = call_open_ai(content, messages)
     logger.info(f"Response from openAI: {response}")
     response = create_message(response["role"], response["content"], user_name)
