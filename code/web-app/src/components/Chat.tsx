@@ -3,7 +3,7 @@ import axios from "axios";
 import { useAuthContext } from "../utils/authContext";
 
 interface ChatMessage {
-  type: "user" | "bot";
+  type: "user" | "assistant";
   message: string;
 }
 
@@ -36,31 +36,28 @@ const Chat: React.FC = () => {
     setInputValue("");
   };
 
-  const sendMessage = (message: string, username: string) => {
-    const url = "http://0.0.0.0:4000/api";
+  const sendMessage = async (message: string, username: string) => {
+    const url = "http://localhost:8080/messages";
     const data = {
-      user_name: username,
-      content: message,
+      message,
+      username,
     };
 
-    console.log("Sending data to backend:", data);
-
-    setIsLoading(true);
-
-    axios
-      .post(url, data)
-      .then((response) => {
-        console.log(response);
-        setChatLog((prevChatLog) => [
-          ...prevChatLog,
-          { type: "bot", message: response.data.content },
-        ]);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        setIsLoading(false);
-        console.log(error);
-      });
+    try {
+      const response = await axios.post(url, data);
+      console.log(response);
+      setChatLog((prevChatLog) => [
+        ...prevChatLog,
+        {
+          type: "assistant",
+          message: response.data.data.messageCreate[0].content,
+        },
+      ]);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
