@@ -12,6 +12,7 @@ def call_open_ai(message: str, previous_messages: list = None) -> dict:
     client = OpenAI(api_key=get_open_ai_api_token())
     messages = [] if previous_messages is None else previous_messages
     messages.append({"role": "user", "content": message})
+    log.info("Calling openAI completions with messages: %s", messages)
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=messages

@@ -56,7 +56,7 @@ def list_messages(chat_user) -> list[UserMessage]:
     result = cb.exec(
         env.get_couchbase_conf(),
         f"SELECT role, content, chat_user, META().id "
-        f"FROM {env.get_couchbase_bucket()}._default.messages msgs "
-        f"WHERE convos.chat_user = '{chat_user}'"
+        f"FROM {env.get_couchbase_bucket()}._default.messages "
+        f"WHERE chat_user = '{chat_user}'"
     )
     return [UserMessage(**r) for r in result]

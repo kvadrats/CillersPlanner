@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from pyexpat.errors import messages
 from typing import AsyncGenerator, List
 
 import strawberry
@@ -18,8 +19,9 @@ class MessageCreateInput:
 
 
 def process_user_message(user_name: str, content: str):
+    # messages = list_messages(user_name)
+    messages = []
     create_message("user", content, user_name)
-    messages = list_messages(user_name)
     messages = [{"role": m.role, "content": m.content} for m in messages]
     response = call_open_ai(content, messages)
     create_message(response["role"], response["content"], user_name)
