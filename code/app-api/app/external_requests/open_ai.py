@@ -23,7 +23,7 @@ def call_open_ai(message: str, previous_messages: list = None) -> dict:
 
 def validate_open_ai_response(response: ChatCompletion) -> None:
     finish_reason = response.choices[0].finish_reason
-    if finish_reason.lower() is not "stop":
+    if finish_reason.lower() != "stop":
         logging.error(
             f"Received message from OpenAI may be incomplete, finish reason was {finish_reason}\n"
             f"Full msg:{str(response)}")

@@ -1,6 +1,6 @@
 import os
 import logging
-
+from functools import cache
 from . import couchbase, http_server
 
 logger = logging.getLogger(__name__)
@@ -22,8 +22,11 @@ def get_http_port() -> int | None:
         except ValueError:
             return None
 
+@cache
 def get_open_ai_api_token() -> str | None:
-    return os.environ.get('OPEN_AI_API_TOKEN')
+    from . import open_ai_key
+
+    return open_ai_key.open_ai_key
 
 def get_http_host() -> str:
     return os.environ.get('HTTP_HOST', '0.0.0.0')
