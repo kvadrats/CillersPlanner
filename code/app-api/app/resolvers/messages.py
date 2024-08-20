@@ -1,6 +1,5 @@
 import asyncio
 import logging
-from pyexpat.errors import messages
 from typing import AsyncGenerator, List
 
 import strawberry
@@ -18,13 +17,15 @@ class MessageCreateInput:
     user_name: str
 
 
-def process_user_message(user_name: str, content: str):
+def process_user_message(user_name: str, content: str) -> UserMessage:
     # messages = list_messages(user_name)
     messages = []
     create_message("user", content, user_name)
     messages = [{"role": m.role, "content": m.content} for m in messages]
     response = call_open_ai(content, messages)
-    create_message(response["role"], response["content"], user_name)
+    logger.info(f"Response from openAI: {response}")
+    response = create_message(response["role"], response["content"], user_name)
+
     return response
 
 
@@ -43,7 +44,8 @@ class Mutation:
         created_items = []
         for message in messages:
             logger.info(f"Mutating message: {message}")
-            process_user_message(message.user_name, message.content)
+            response = process_user_message(message.user_name, message.content)
+            created_items.append(response)
         return created_items
 
 
