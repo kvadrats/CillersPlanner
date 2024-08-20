@@ -17,10 +17,10 @@ templates:
   - kong
   - web-app 
   - app-api
-  - redpanda
-  - redpanda-console
-  - kafka-connect
-  - create-connectors
+#  - redpanda
+#  - redpanda-console
+#  - kafka-connect
+#  - create-connectors
 
 - id: couchbase-aihack
   run:

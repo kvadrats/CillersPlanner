@@ -7,7 +7,7 @@ from . import couchbase as cb, env
 
 @strawberry.type
 class UserMessage:
-    id = str
+    id: str
     role: str
     content: str
     chat_user: str
